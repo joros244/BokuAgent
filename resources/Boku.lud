@@ -1,0 +1,36 @@
+(define "SandwichedPiece"
+	(custodial
+		(from (last To))
+		Orthogonal
+		(between
+		(exact 2)
+		if:(is Enemy (who at:(between)))
+		(apply (set Pending (between))))
+		(to if:(is Friend (who at:(to))))
+		(then (moveAgain))
+	)
+)
+
+(game "Boku"
+    (players 2)
+    (equipment
+        {
+            (board (rotate 30 (hex {6 6 5 6 6 5 })))
+	    (piece "Ball" Each)
+        }
+    )
+    (rules
+        (play
+        (if (no Moves Mover) (pass)
+			(if (not "SameTurn")
+				(move Add (to (difference (sites Empty) (last To))) (then "SandwichedPiece"))
+				(move Remove (sites Pending))
+			)
+		)
+	)
+	(end {
+		(if (is Line 5 what:(id "Ball" Mover)) (result Mover Win))
+		(if (and (no Moves Mover) (no Moves Next)) (result Mover Draw))
+	})
+    )
+)
